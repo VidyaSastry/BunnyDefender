@@ -1,11 +1,15 @@
 BunnyDefender.Game = function(game){
   this.totalBunnies;
   this.bunnyGroup;
+  this.totalSpacerocks;
+  this.spacerockGroup;
+  this.burst;
 }
 
 BunnyDefender.Game.prototype = {
   create: function(){ 
     this.totalBunnies = 20;
+    this.totalSpacerocks = 13;
     this.buildWorld();
   },
   
@@ -13,6 +17,8 @@ BunnyDefender.Game.prototype = {
     this.add.image(0, 0, 'sky');
     this.add.image(0, 800, 'hill');
     this.buildBunnies();
+    this.buildSpaceRocks();
+    this.buildEmitter();
   },
   
   buildBunnies: function(){
@@ -52,6 +58,51 @@ BunnyDefender.Game.prototype = {
     b.animations.play('Rest', 24, true);
     this.assignBunnyMovement(b);
   },
+  
+  buildSpaceRocks: function() {
+    this.spacerockgroup = this.add.group();
+    for(var i=0; i<this.totalSpacerocks; i++) {
+        var r = this.spacerockgroup.create(this.rnd.integerInRange(0, this.world.width), this.rnd.realInRange(-1500, 0), 'spacerock', 'SpaceRock0000');
+        var scale = this.rnd.realInRange(0.3, 1.0);
+        r.scale.x = scale;
+        r.scale.y = scale;
+        this.physics.enable(r, Phaser.Physics.ARCADE);
+        r.enableBody = true;
+        r.body.velocity.y = this.rnd.integerInRange(200, 400);
+        r.animations.add('Fall');
+        r.animations.play('Fall', 24, true);
+        r.checkWorldBounds = true;
+        r.events.onOutOfBounds.add(this.resetRock, this);
+    }
+},
+  
+  resetRock: function(r) {
+    if(r.y > this.world.height) {
+      this.respawnRock(r);
+    }
+  },
+  
+  respawnRock: function(r) {
+    r.reset(this.rnd.integerInRange(0, this.world.width), this.rnd.realInRange(-1500, 0));
+    r.body.velocity.y = this.rnd.integerInRange(200, 400);
+  },
+  
+  buildEmitter:function() {
+    this.burst = this.add.emitter(0, 0, 80);
+    this.burst.minParticleScale = 0.3;
+    this.burst.maxParticleScale = 1.2;
+    this.burst.minParticleSpeed.setTo(-30, 30);
+    this.burst.maxParticleSpeed.setTo(30, -30);
+    this.burst.makeParticles('explosion');
+    this.input.onDown.add(this.fireBurst, this);
+},
+
+fireBurst: function(pointer) {
+    this.burst.emitX = pointer.x;
+    this.burst.emitY = pointer.y;
+    this.burst.start(true, 2000, null, 20); //(explode, lifespan, frequency, quantity)
+}, 
+  
   
   update: function(){}
 }

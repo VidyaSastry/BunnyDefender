@@ -18,6 +18,7 @@ BunnyDefender.Boot.prototype = {
 		this.scale.pageAlignVertically = true;
 		this.stage.forcePortrait = true;
 		this.scale.updateLayout(true);
+        this.scale.setMinMax(270,480,270,480);
 
 		this.input.addPointer();
 		this.stage.backgroundColor = '#171642';
