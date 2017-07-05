@@ -103,6 +103,30 @@ fireBurst: function(pointer) {
     this.burst.start(true, 2000, null, 20); //(explode, lifespan, frequency, quantity)
 }, 
   
+  burstCollision: function(r, b) {
+    this.respawnRock(r);
+},
   
-  update: function(){}
+  bunnyCollision: function(r, b) {
+    if(b.exists){
+        this.respawnRock(r);
+        b.kill();
+        this.totalBunnies--;
+        this.checkBunniesLeft();
+    }
+},
+
+checkBunniesLeft: function() {
+    if(this.totalBunnies <= 0){
+        // GAME OVER
+    }
+},
+  update: function(){
+    this.physics.arcade.overlap(this.spacerockgroup, this.burst, this.burstCollision, null, this);
+//(object1, object2, overlapCallback, processCallback, callbackContext)
+    this.physics.arcade.overlap(this.spacerockgroup, this.bunnygroup, this.bunnyCollision, null, this);
+
+  }
+  
+  
 }
